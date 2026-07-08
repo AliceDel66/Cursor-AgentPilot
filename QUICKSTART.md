@@ -76,3 +76,4 @@ acceptance:
 - 系统学习：README 的[新手路径](README.md#%EF%B8%8F-新手路径)（5 章手册循序渐进）。
 - 完整协议：[`docs/03-dispatch-design.md`](docs/03-dispatch-design.md)——全量字段、routing matrix、隔离与 worktree、失败重试。
 - 全量模板：[`templates/task-package.md`](templates/task-package.md)（CC0，直接复制进私有项目）。
+- 一键挂载：README 的[挂载到你的项目](README.md#-挂载到你的项目)——install.sh 或 skill 安装，装完对 Agent 只说需求即可。

@@ -60,6 +60,23 @@ flowchart LR
 
 不想读手册？[QUICKSTART.md](QUICKSTART.md) 提供最短路径：复制一份最小任务包、填 5 个必填项、粘贴派发话术，30 秒发出第一个合规派发。跑通之后再回来按下面的路径系统学习。
 
+## 🔌 挂载到你的项目
+
+三种方式把 AgentPilot 工作流装进任何项目，装完后**对 Agent 只说需求即可**触发协议闭环：
+
+1. **一键挂载**（推荐）：
+
+```bash
+git clone https://github.com/AliceDel66/Cursor-AgentPilot.git
+./Cursor-AgentPilot/install.sh /path/to/your-project
+```
+
+自动创建 `tasks/`、`runs/`，复制协议模板到 `templates/agentpilot/`，并生成 `.cursor/rules/agentpilot-coordinator.mdc`（Coordinator 行为规则）。脚本幂等，已有文件不会被覆盖。
+
+2. **手动复制**：把 `templates/` 下需要的模板复制进你的项目（CC0，无署名负担），照 [QUICKSTART.md](QUICKSTART.md) 的话术使用。
+
+3. **安装 Skill**（跨项目生效）：`./install.sh /path/to/your-project --skill` 会把 Coordinator skill 装到 `~/.cursor/skills/agentpilot/`，此后任何对话中提出开发/修复需求都会自动按协议整理任务包。
+
 ## ⚡ 5 分钟快速开始
 
 1. **读定位**：花 1 分钟读完"这是什么"，确认你的场景匹配。
@@ -89,6 +106,9 @@ flowchart LR
 cursor-agentpilot/
   README.md                        # 本文件：定位、快速开始、导航
   QUICKSTART.md                    # 30 秒上手：最小任务包 + 派发/验收话术
+  install.sh                       # 一键挂载脚本（POSIX shell，零依赖）
+  skills/
+    agentpilot/SKILL.md            # Coordinator skill（Cursor Agent Skill 格式）
   LICENSE                          # CC BY 4.0
   CONTRIBUTING.md                  # 贡献指引
   docs/
