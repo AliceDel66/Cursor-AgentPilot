@@ -2,7 +2,7 @@
 title: 质量门禁
 last_verified: 2026-07-08
 sources:
-  - docs/00-project-brief.md 第 6.2、9.3、9.4、9.5、11 节
+  - docs/00-project-brief.md 第 6.2、9.3、9.4、9.5、9.6、11 节
   - templates/review-packet.md
   - templates/acceptance-checklist.md
 status: complete
@@ -55,6 +55,8 @@ review packet 是执行方的"证据陈述"，字段与 `templates/review-packet
 ## 4. Reviewer Gate 用法
 
 reviewer 的价值来自**独立性**：它没有执行过程的立场，只看事实。三工具配置（Claude 承担）与双工具配置（按立项书 9.4 降级为 Codex 双会话 / Cursor 审查 / human 加重）下，操作要点相同：
+
+`gate_required: reviewer` 时，reviewer gate 有一个硬约束：reviewer 的模型家族必须不同于 executor，例如 GPT 执行后交给 Claude 审查。同族模型审同族模型的产出，容易沿着相同盲点通过，不能视为完整独立 gate。无法满足跨模型家族时，按 9.4 降级：全新只读会话 + human gate 加重，并在 review packet frontmatter 标注 `same-family-review: true`。
 
 **给 reviewer 的上下文最小集**——只给三样：
 

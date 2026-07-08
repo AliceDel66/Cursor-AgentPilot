@@ -40,6 +40,7 @@ Cursor 已经从代码编辑器演进为 agentic coding 工作台，但新手的
 | **Reviewer / Architect** | 方案评审、代码 review、风险发现、gate 判断 | Claude（没有 Claude 也能用，见立项书 9.4 双工具降级模式） |
 
 **Markdown task package 是跨工具交接协议**：谁接任务都先读同一份上下文。
+`route: codex` 默认跑本机 Codex CLI（`engine: codex-cli`）；没有 CLI 或希望留在 Cursor 内时，必须显式写 `engine: cursor-subagent`，因为二者模型来源和计费口径不同。
 
 ```mermaid
 flowchart LR
@@ -163,6 +164,7 @@ cursor-agentpilot/
 | `acceptance[]` | 可执行、可判定的验收标准 |
 | `risk_level` / `gate_required` | 风险等级与门禁要求 |
 | `isolation` | 执行隔离级别：`none` / `branch` / `worktree` |
+| `engine` / `model_override` | 可选：声明实际执行引擎；模型默认按 risk_level 派生，必要时才覆盖 |
 
 隔离机制是硬约束而非建议：**并行写同一 repo 的任务强制各自独立 worktree，merge 动作只能由 human gate 执行**——用机制而不是纪律避免多 Agent 同仓冲突（详见立项书 9.5）。
 

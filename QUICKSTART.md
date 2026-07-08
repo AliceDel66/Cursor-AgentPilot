@@ -28,6 +28,7 @@ git clone https://github.com/AliceDel66/Cursor-AgentPilot.git
 ```
 
 Agent 应：澄清 → 在 `tasks/` 生成任务包 → 选 route 并派发 → 汇总等你 gate。你只需对照 acceptance 验收。
+`route: codex` 默认使用本机 Codex CLI；如果本机没有 `codex` 命令，需显式改为 `engine: cursor-subagent`，不要静默替换。
 
 ## 手动模式（三步用法）
 
@@ -46,6 +47,7 @@ Agent 应：澄清 → 在 `tasks/` 生成任务包 → 选 route 并派发 → 
 task_id: FIX-001
 type: bugfix                 # feature | bugfix | refactor | docs | research | qa
 route: codex                 # cursor | cursor-multitask | codex | codex+reviewer-gate
+# engine: codex-cli          # 可选；route: codex 默认本机 Codex CLI，无 CLI 才显式写 cursor-subagent
 scope:
   allow:
     - src/pages/login/**

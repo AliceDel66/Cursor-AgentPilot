@@ -6,7 +6,14 @@ type: feature                  # 任务类型：feature | bugfix | refactor | do
 route: codex                   # 派发路径：cursor | cursor-multitask | codex | codex+reviewer-gate
                                # reviewer 为角色名，默认由 Claude 承担；无 Claude 时按立项书 9.4 映射
                                # （Codex 双会话 / Cursor 审查 / human gate 加重）
+# engine: codex-cli            # 可选执行引擎：codex-cli | cursor-subagent
+                               # route: codex 默认 codex-cli；用 cursor-subagent 必须显式声明
 risk_level: low                # 风险等级：low | medium | high（涉及 auth/payment/data/deployment 至少 medium）
+                               # 模型档位默认派生：low→fast / medium→standard / high→high
+                               # type: refactor | research 上调一档；具体模型 slug 可由 skill / 用户配置映射
+# model_override:              # 可选：需精确控制模型时取消注释；不填则按 risk_level 派生
+#   executor: gpt-5            # 示例：执行方模型 slug
+#   reviewer: claude-sonnet-4  # 示例：reviewer 模型 slug；reviewer gate 应跨模型家族
 gate_required: human           # 门禁要求：none | reviewer | human（high 风险必须 human）
 isolation: none                # 隔离级别：none | branch | worktree（规则见立项书 9.5）
                                # 强制升级：并行写同一 repo → worktree；high 风险 → 至少 branch（并行时必须 worktree）

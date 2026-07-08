@@ -2,7 +2,7 @@
 title: 任务派发设计
 last_verified: 2026-07-08
 sources:
-  - docs/00-project-brief.md 第 5、9 节
+  - docs/00-project-brief.md 第 5、9、9.6 节
   - templates/task-package.md
   - https://cursor.com/changelog/04-24-26
 status: complete
@@ -59,6 +59,40 @@ merge 与最终判定属于 **human gate**，不属于任何 AI 角色。
 
 枚举：`cursor | cursor-multitask | codex | codex+reviewer-gate`。reviewer 为角色名，默认由 Claude 承担；无 Claude 时按 9.4 映射（见第 5 节）。
 **填错的后果**：该走 gate 的任务填了 `codex`，改动没人独立审查就进了主干；只读调研填了 `codex`，白白多花一轮交接成本。选择方法见第 4 节 routing matrix。
+
+### 执行引擎与模型路由
+
+`route` 只决定派给哪个角色，不决定实际在哪个引擎跑、用哪个模型。执行引擎与模型路由以立项书 9.6 为准：
+
+| `engine` | 实际运行 | 模型来源 / 计费 | 适用 |
+| --- | --- | --- | --- |
+| `codex-cli`（`route: codex` 的默认） | 本机 `codex exec` | OpenAI 订阅，`-m` 可指定 | 真实 repo 执行、跑测试，与 Cursor 用量隔离 |
+| `cursor-subagent` | Cursor 后台 subagent | Cursor 模型池 / Cursor 订阅 | 无本机 CLI、或希望全程留在 Cursor 内 |
+
+默认与显式声明规则：
+
+- `route: codex` 默认 `engine: codex-cli`；如果要用 `cursor-subagent`，必须在 task package 显式写 `engine: cursor-subagent`。
+- 派发前先验证引擎：`which codex` 不可用时报告用户并征求是否降级，禁止静默把 `codex-cli` 换成 `cursor-subagent`。
+- 派发话术必须包含实际执行命令或引擎声明，方便事后审计成本和模型来源。
+
+模型不新增必填字段，默认从 `risk_level` 派生档位：
+
+| 输入 | 默认档位 |
+| --- | --- |
+| `risk_level: low` | fast |
+| `risk_level: medium` | standard |
+| `risk_level: high` | high |
+| `type: refactor | research` | 在 risk 档位基础上上调一档 |
+
+档位到具体模型 slug 的映射放在 skill 或用户配置中；未来可选扩展为 `.agentpilot/models.yaml`，但协议核心不绑定会过期的具体 slug。需要精确控制时，才在 task package 里写可选字段：
+
+```yaml
+model_override:
+  executor: gpt-5
+  reviewer: claude-sonnet-4
+```
+
+`gate_required: reviewer` 时 reviewer 模型家族必须不同于 executor；无法满足时按双工具降级处理，并在 review packet 标注 `same-family-review: true`。
 
 ### `risk_level`
 

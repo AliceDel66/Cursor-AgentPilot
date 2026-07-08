@@ -34,11 +34,14 @@ acceptance: []               # 每条可执行、可判定
 
 正文写三节：目标 / 上下文 / 非目标。省略字段按默认值生效：`risk_level: low`、`gate_required: human`、`isolation: none`、`protocol_version: "0.1"`。
 
-### 3. 选路由与隔离
+### 3. 选路由、隔离与引擎
 
 - 小改动 → `cursor`；只读并行调研 → `cursor-multitask`；需本地验证的实现 → `codex`；需独立审查 → `codex+reviewer-gate`。
+- `route: codex` 默认 `engine: codex-cli`。派发前运行 `which codex` 验证本机 Codex CLI 可用；不可用时先报告用户并请求是否降级为 `engine: cursor-subagent`，禁止静默换引擎。
+- 模型默认从 `risk_level` 派生：low → fast、medium → standard、high → high；`type: refactor | research` 上调一档。只有需要精确控制时才写 `model_override.executor / model_override.reviewer`。
 - 涉及 auth / payment / data / deployment / shared contract：`risk_level` 升 `medium` 以上、`gate_required: human`、`isolation` 至少 `branch`。
 - 与其他写任务并行同一 repo：`isolation: worktree`，分支 `task/<task_id>`。
+- `gate_required: reviewer` 时 reviewer 必须尽量使用不同模型家族；无法满足时在 review packet 标注 `same-family-review: true` 并加重 human gate。
 - 完整规则见项目内 `templates/agentpilot/task-package.md` 注释与 AgentPilot 手册 docs/03。
 
 ### 4. 派发
@@ -49,6 +52,8 @@ acceptance: []               # 每条可执行、可判定
 请按 tasks/<task_id>.md 的任务包执行：
 只修改 scope.allow 内的文件，不得触碰 scope.deny；
 完成后逐条回报 acceptance 的执行结果（贴命令原始输出，不要只说"已完成"）。
+如果 engine=codex-cli，实际执行命令示例：
+codex exec -C <repo> --sandbox workspace-write "按 tasks/<task_id>.md 的任务包执行"
 ```
 
 ### 5. 汇总并等待 human gate

@@ -2,7 +2,7 @@
 title: 成本与风险控制
 last_verified: 2026-07-08
 sources:
-  - docs/00-project-brief.md 第 9.2、11、12 节
+  - docs/00-project-brief.md 第 9.2、9.6、11、12 节
 status: complete
 ---
 
@@ -17,6 +17,8 @@ status: complete
 - **token 成本**：模型调用消耗。与任务描述质量强相关——模糊任务导致 agent 多轮试错，烧的都是 token。
 - **时间成本**：交接（写包、派发、读回传）、等待、review 的人力时间。
 - **返工成本**：范围跑偏、验收不明、并行冲突导致的重做。三类里最贵，且往往被记在"模型不行"头上。
+
+**引擎选择即计费选择**：`engine: codex-cli` 跑在本机 `codex exec`，模型与用量归 OpenAI 订阅；`engine: cursor-subagent` 跑在 Cursor 后台 subagent，模型与用量归 Cursor 订阅。把二者混用却不留档，会让成本归因不可审计：你以为在花 Codex 额度，实际可能在消耗 Cursor 用量，或反过来。因此 task package / review packet / 派发话术都应记录实际 engine。
 
 并行放大所有三类：N 个 agent 是 N 份 token；每个 agent 都要一份完整上下文；产出要 N 次 review。**并行的收益只有时间，成本却是全方位的**——这是"能串行不并行"的经济学依据。
 

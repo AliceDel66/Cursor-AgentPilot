@@ -5,6 +5,11 @@ task_id: EX-001                # 对应 task package 的 task_id，必须一致
 verdict: PASS                  # 执行方自评结论：PASS | FAIL
 retries: 0                     # 本任务累计重试次数；narrow retry 一次 +1
 worktree_branch: ""            # 可选：isolation: worktree 任务填分支名（如 task/EX-001），其余留空
+# engine: codex-cli            # 可选：实际执行引擎 codex-cli | cursor-subagent，需与 task package / 派发话术一致
+# model_used:                  # 可选：记录实际使用模型，便于成本与审查复盘
+#   executor: gpt-5
+#   reviewer: claude-sonnet-4
+# same-family-review: false    # 可选：无法跨模型家族 review 时标 true，并加重 human gate
 evidence:                      # 证据列表：命令输出、测试结果、截图路径
   - "npm test -- feature-x：42 passed, 0 failed"
   - "screenshots/feature-x-list.png"
