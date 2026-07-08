@@ -13,6 +13,7 @@
 | 2 | 新手手册正文（docs/01、02）+ README 开源化美化 + LICENSE（commit 803d13e） | 完成，已验收 |
 | 3 | 派发设计正文（docs/03、04、05）（commit ea28934） | 完成，已验收 |
 | 3.5 | QUICKSTART 极简用法 + README 声明（commit 49cd744） | 完成，已验收 |
+| 3.6 | AgentPilot skill + install.sh 一键挂载（commit 39252d5） | 完成，已验收 |
 | 4 | 示例闭环（examples + runs 首批留档） | 待启动 |
 
 ---
