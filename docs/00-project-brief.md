@@ -289,6 +289,34 @@ worktree:                  # isolation: worktree 时必填
   merge_by: human          # 合并权限：human | coordinator
 ```
 
+### 9.6 执行引擎与模型路由（v0.2.3 新增）
+
+`route` 只回答"派给哪个角色"，不回答两个实操问题：**在哪个引擎上跑**、**用什么模型**。缺了这两层，"派发 Codex"可能实际跑在 Cursor 的内部 subagent 上（模型与账单都走 Cursor），与用户预期不符且不可审计。
+
+**执行引擎绑定（engine）**：
+
+| `engine` | 实际运行 | 模型来源 / 计费 | 适用 |
+| --- | --- | --- | --- |
+| `codex-cli`（`route: codex` 的默认） | 本机 `codex exec` | OpenAI 订阅，`-m` 可指定 | 真实 repo 执行、跑测试，与 Cursor 用量隔离 |
+| `cursor-subagent` | Cursor 后台 subagent | Cursor 模型池 / Cursor 订阅 | 无本机 CLI、或希望全程留在 Cursor 内 |
+
+规则：
+
+- `route: codex` 默认 `engine: codex-cli`；用 `cursor-subagent` 必须在 task package 显式声明——引擎差异影响成本与模型，不允许隐式替换。
+- coordinator 派发前应验证引擎可用（`which codex`），不可用时报告用户并征求降级同意，禁止静默换引擎。
+- 派发话术必须包含实际执行命令或引擎声明，留档可审计。
+
+**模型路由（派生优先，覆盖可选）**：
+
+- 模型不新增必填字段，默认从 `risk_level` 派生档位：low → fast、medium → standard、high → high；`type: refactor | research` 上调一档。
+- 档位到具体模型的映射写在 skill / 用户配置（可选 `.agentpilot/models.yaml`），协议核心不含具体模型 slug（slug 会过期，档位不会）。
+- 需精确控制时用可选字段 `model_override.executor / model_override.reviewer` 直接写 slug。
+
+**Cross-model review 原则（硬约束）**：
+
+- `gate_required: reviewer` 时，reviewer 的**模型家族必须不同于 executor**（如 GPT 执行 → Claude 审查）。同族模型审自己家的产出，会顺同样的思路盲过，gate 失去独立性。
+- 无法满足（如双工具且同族）时按 9.4 降级：全新只读会话 + human gate 加重，并在 review packet 标注 `same-family-review: true`。
+
 ## 10. 仓库架构
 
 ```text

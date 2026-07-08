@@ -344,6 +344,72 @@ scope:
 
 ---
 
+## Task Package: S3.7 执行引擎与模型路由对齐
+
+```yaml
+task_id: S3.7-engine-model
+type: docs-content
+route: codex
+engine: codex-cli          # 本任务本身即用本机 Codex CLI 执行（validate the path）
+risk_level: low
+gate_required: human
+isolation: none
+protocol_version: "0.1"
+scope:
+  allow:
+    - templates/task-package.md
+    - templates/review-packet.md
+    - skills/agentpilot/SKILL.md
+    - install.sh
+    - docs/03-dispatch-design.md
+    - docs/04-quality-gate.md
+    - docs/05-cost-and-risk.md
+    - README.md
+    - QUICKSTART.md
+  deny:
+    - docs/00-project-brief.md
+    - docs/01-cursor-beginner-guide.md
+    - docs/02-agent-mode-map.md
+    - examples/**
+    - plans/plan.md
+    - LICENSE
+    - CONTRIBUTING.md
+```
+
+### 背景
+
+用户从用量日志发现："派发 Codex" 实际跑在 Cursor 内部 subagent 上（模型/账单走 Cursor），并非本机 Codex CLI。立项书 v0.2.3 新增 9.6 节"执行引擎与模型路由"（权威来源），需要全仓对齐。
+
+### 目标
+
+协议明确区分执行引擎（codex-cli 默认 / cursor-subagent 显式）；模型按 risk_level 派生、可选覆盖；cross-model review 成为 gate 硬约束。
+
+### 交付物
+
+1. `templates/task-package.md`：frontmatter 增加可选注释字段 `engine`（codex-cli | cursor-subagent，route: codex 时默认 codex-cli，用 cursor-subagent 必须显式声明）与注释掉的 `model_override.executor/reviewer` 示例；注释说明派生规则（risk_level low→fast / medium→standard / high→high，refactor|research 上调一档）。
+2. `templates/review-packet.md`：frontmatter 增加可选 `engine`、`model_used`、`same-family-review` 注释字段。
+3. `skills/agentpilot/SKILL.md`：第 3 步"选路由与隔离"扩展为"选路由、隔离与引擎"；新增引擎验证（`which codex`，不可用先报告用户，禁止静默换 cursor-subagent）；派发话术带上实际执行命令示例（`codex exec -C <repo> --sandbox workspace-write "<任务包路径与指令>"`）；补 cross-model 原则一句。
+4. `install.sh` 生成的 `.mdc` 规则同步上述第 3 步内容（与 SKILL.md 一致）。
+5. `docs/03-dispatch-design.md`：新增"执行引擎与模型路由"一节（引擎对照表、默认与显式声明规则、派生档位、model_override、指向立项书 9.6）；routing matrix 不改结构，仅在该节文字说明。
+6. `docs/04-quality-gate.md`：reviewer gate 一节补 cross-model 硬约束与 same-family-review 降级标注。
+7. `docs/05-cost-and-risk.md`：成本模型补一段"引擎选择即计费选择"（Cursor 订阅 vs OpenAI 订阅，引擎混淆导致的成本不可审计）。
+8. `README.md` / `QUICKSTART.md`：各加 1-2 句引擎说明（默认本机 Codex CLI，无 CLI 用 cursor-subagent）。
+
+### 非目标 / 禁止项
+
+- 不改立项书（9.6 已由 coordinator 写好）、docs/01、02、examples。
+- 不引入 models.yaml 实体文件（本轮只在文档说明其为可选扩展，P3 再实现）。
+- 字段名以立项书 9.6 为准：engine、model_override、same-family-review；不新造其他字段。
+
+### 验收
+
+- PyYAML 全仓 frontmatter 解析通过。
+- SKILL.md、install.sh 生成规则、docs/03 三处的引擎/模型表述一致。
+- `bash -n install.sh` 通过。
+- git commit（不 push，验收后统一 push）。
+
+---
+
 ## Sprint 4 任务包
 
-待 Sprint 3.5 验收通过后拆解。
+待 S3.7 验收通过后拆解。
