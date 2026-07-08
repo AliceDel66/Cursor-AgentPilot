@@ -6,7 +6,7 @@ sources:
 status: skeleton
 ---
 
-# 任务派发设计：Cursor -> Codex / Claude
+# 任务派发设计：coordinator -> executor / reviewer
 
 > 本章为 Sprint 1 骨架，正文将在 Sprint 3 补全。目标：用户能把任务写成 task package，并根据 routing matrix 选对派发路径。
 
@@ -16,7 +16,7 @@ status: skeleton
 
 ## 2. 角色分工
 
-Cursor（cockpit）、Codex（executor）、Claude（reviewer/architect）各自最适合与不适合做什么。
+按角色讲分工：coordinator（默认 Cursor）、executor（默认 Codex）、reviewer/architect（默认 Claude，可按立项书 9.4 降级）各自最适合与不适合做什么。
 
 ## 3. Task Package 协议
 

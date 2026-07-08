@@ -42,4 +42,4 @@ Worktrees / multi-root workspaces 如何承载后台分支和跨仓库任务。
 
 ## 8. 下一步
 
-指向 `03-dispatch-design.md`：当任务超出 Cursor 单模式能力时，如何派发给 Codex / Claude。
+指向 `03-dispatch-design.md`：当任务超出 Cursor 单模式能力时，如何派发给 executor / reviewer（默认 Codex / Claude）。

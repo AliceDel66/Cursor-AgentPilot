@@ -4,12 +4,12 @@ last_verified: 2026-07-08
 sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
-suited_route: "Codex（trace + 修复 + 测试）-> Claude review"
+suited_route: "Codex（trace + 修复 + 测试）-> reviewer gate"
 ---
 
 # 案例：Bug 排查修复流程（bug-hunt-flow）
 
-> 场景：线上/本地出现一个可复现的 bug，需要定位根因、修复并验证。适用路径：Codex 执行 trace 与修复，Claude review gate。本案例计划包含真实 FAIL → narrow retry → PASS 记录。骨架，Sprint 4 补全。
+> 场景：线上/本地出现一个可复现的 bug，需要定位根因、修复并验证。适用路径：Codex 执行 trace 与修复，reviewer gate（默认 Claude，双工具模式见立项书 9.4）。本案例计划包含真实 FAIL → narrow retry → PASS 记录。骨架，Sprint 4 补全。
 
 ## 1. 场景与输入 prompt
 
@@ -29,7 +29,7 @@ bug 现象、复现步骤与用户的初始 prompt。
 
 ## 5. Review 与 gate
 
-Claude review 结论与最终 human gate 判定。
+Reviewer 审查结论与最终 human gate 判定。
 
 ## 6. 复盘
 

@@ -22,9 +22,9 @@ status: skeleton
 
 逐字段讲解 review packet 的 frontmatter（`task_id`、`verdict`、`evidence`、`retries`）与正文结构（改动摘要/验证证据/风险发现/gate 建议）。
 
-## 4. Claude review 的用法
+## 4. Reviewer gate 的用法
 
-把 diff 与 review packet 交给 Claude 做独立审查：怎么给上下文、要求什么输出。
+把 diff 与 review packet 交给 reviewer 角色（默认 Claude）做独立审查：怎么给上下文、要求什么输出。本节同时覆盖双工具降级模式（无 Claude 时的 Codex 双会话 / Cursor 审查 / human gate 加重，见立项书 9.4）。
 
 ## 5. Human Gate
 

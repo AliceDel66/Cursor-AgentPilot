@@ -4,12 +4,12 @@ last_verified: 2026-07-08
 sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
-suited_route: "Codex implementation + Claude gate（行为不变是硬验收）"
+suited_route: "Codex implementation + reviewer gate（行为不变是硬验收）"
 ---
 
 # 案例：重构流程（refactor-flow）
 
-> 场景：对一个模块做结构性重构，要求行为完全不变。适用路径：Codex 执行 + Claude gate，测试基线是硬验收；禁止与其他任务并行改同一链路。骨架，Sprint 4 补全。
+> 场景：对一个模块做结构性重构，要求行为完全不变。适用路径：Codex 执行 + reviewer gate（默认 Claude，双工具模式见立项书 9.4），测试基线是硬验收；禁止与其他任务并行改同一链路。骨架，Sprint 4 补全。
 
 ## 1. 场景与输入 prompt
 
@@ -29,7 +29,7 @@ suited_route: "Codex implementation + Claude gate（行为不变是硬验收）"
 
 ## 5. Review 与 gate
 
-Claude 对结构变化的审查与 gate 结论。
+Reviewer 对结构变化的审查与 gate 结论。
 
 ## 6. 复盘
 

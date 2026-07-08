@@ -3,9 +3,11 @@
 # 用法：复制本文件，替换所有示例值；人读正文，工具读 frontmatter。
 task_id: EX-001                # 任务唯一 ID，建议 <前缀>-<序号> 或 <日期>-<slug>
 type: feature                  # 任务类型：feature | bugfix | refactor | docs | research | qa
-route: codex                   # 派发路径：cursor | cursor-multitask | codex | claude | codex+claude-gate
+route: codex                   # 派发路径：cursor | cursor-multitask | codex | codex+reviewer-gate
+                               # reviewer 为角色名，默认由 Claude 承担；无 Claude 时按立项书 9.4 映射
+                               # （Codex 双会话 / Cursor 审查 / human gate 加重）
 risk_level: low                # 风险等级：low | medium | high（涉及 auth/payment/data/deployment 至少 medium）
-gate_required: human           # 门禁要求：none | claude | human（high 风险必须 human）
+gate_required: human           # 门禁要求：none | reviewer | human（high 风险必须 human）
 protocol_version: "0.1"        # 协议版本，勿手改；schema 变更时由维护者升级
 scope:
   allow:                       # 允许修改的文件/目录（glob），执行方不得越界

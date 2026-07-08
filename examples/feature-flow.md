@@ -4,12 +4,12 @@ last_verified: 2026-07-08
 sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
-suited_route: "Cursor Plan -> task package -> Codex（+ Claude gate，视风险）"
+suited_route: "Cursor Plan -> task package -> Codex（+ reviewer gate，视风险）"
 ---
 
 # 案例：功能开发端到端流程（feature-flow）
 
-> 场景：为现有项目新增一个中等规模功能（如列表分页）。适用路径：先用 Cursor Plan 拆解，再写 task package 派发给 Codex 实现；涉及共享契约时加 Claude gate。骨架，Sprint 4 补全真实闭环记录。
+> 场景：为现有项目新增一个中等规模功能（如列表分页）。适用路径：先用 Cursor Plan 拆解，再写 task package 派发给 Codex 实现；涉及共享契约时加 reviewer gate（默认 Claude，双工具模式见立项书 9.4）。骨架，Sprint 4 补全真实闭环记录。
 
 ## 1. 场景与输入 prompt
 

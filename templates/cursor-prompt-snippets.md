@@ -39,7 +39,7 @@ last_verified: 2026-07-08
 
 ## 4. 生成 task package
 
-适用：任务需要派发给 Codex / Claude 时，让 Cursor 按协议模板产出任务包。
+适用：任务需要派发给 executor / reviewer（默认 Codex / Claude，双工具模式见立项书 9.4）时，让 Cursor 按协议模板产出任务包。
 
 ```text
 把下面的需求整理成 task package，使用 templates/task-package.md 的结构，
@@ -58,7 +58,7 @@ frontmatter 字段填全（task_id、type、route、scope、acceptance、risk_le
 
 ## 6. Review 派发
 
-适用：把 diff 交给 Claude 或另一个 agent 做独立审查。
+适用：把 diff 交给 reviewer 角色做独立审查（审查会话不得复用执行会话的上下文）。
 
 ```text
 请 review 以下改动（对应任务包 <task_id>）：
