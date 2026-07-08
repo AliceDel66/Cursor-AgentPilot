@@ -21,7 +21,7 @@ status: active
 
 | 日期 | Cursor 变更 | 来源 | 受影响章节 | 核验状态 |
 | --- | --- | --- | --- | --- |
-| 2026-04-24 | Multitask（`/multitask` 并行 async subagents）、Worktrees、Multi-root Workspaces | [changelog/04-24-26](https://cursor.com/changelog/04-24-26) | docs/01 第 3 节（Agent Window）；docs/02 第 5、6、7 节（Multitask/Worktree/Multi-root 全部依赖此版本能力） | 已核验（2026-07-08，随 Sprint 2 正文撰写完成） |
+| 2026-04-24 | Multitask（`/multitask` 并行 async subagents）、Worktrees、Multi-root Workspaces | [changelog/04-24-26](https://cursor.com/changelog/04-24-26) | docs/01 第 3 节（Agent Window）；docs/02 第 5、6、7 节（Multitask/Worktree/Multi-root 全部依赖此版本能力）；docs/03 第 4、6 节（routing matrix 的 Multitask 路径与 worktree 生命周期） | 已核验（2026-07-08，随 Sprint 2/3 正文撰写完成） |
 
 ## 3. 待核验队列
 

@@ -61,7 +61,7 @@ flowchart LR
 1. **读定位**：花 1 分钟读完"这是什么"，确认你的场景匹配。
 2. **挑一个真实小任务**：比如"修一个已知 bug"或"加一个小函数"，不要从大重构开始。
 3. **复制模板**：把 `templates/task-package.md` 复制一份，按字段说明填写背景、目标、范围（allow/deny）、隔离级别、验收标准。
-4. **选路径派发**：对照 `docs/03-dispatch-design.md` 的 routing matrix（骨架期可先看 `docs/00-project-brief.md` 第 9.2 节），判断这个任务该交给 Cursor 直接改、Codex 执行，还是需要 reviewer 审查（默认 Claude，双工具模式见立项书 9.4）。
+4. **选路径派发**：对照 [`docs/03-dispatch-design.md`](docs/03-dispatch-design.md) 的 routing matrix 实操版，判断这个任务该交给 Cursor 直接改、Codex 执行，还是需要 reviewer 审查（默认 Claude，双工具模式见 docs/03 第 5 节）。
 5. **验收与留档**：执行完成后对照验收标准逐条检查；如果走了 executor / reviewer 派发，用 `templates/review-packet.md` 汇总证据，由你做最终 human gate。
 
 跑完一次闭环，你就理解了本项目的全部核心概念：task package → routing → 执行 → review → gate。
@@ -90,9 +90,9 @@ cursor-agentpilot/
     00-project-brief.md            # 立项书：架构、护城河、协议规范（已定稿）
     01-cursor-beginner-guide.md    # Cursor 新手手册（正文完成）
     02-agent-mode-map.md           # Chat/Agent/Plan/Multitask/Worktree 使用边界（正文完成）
-    03-dispatch-design.md          # coordinator -> executor/reviewer 任务派发设计
-    04-quality-gate.md             # 验收、review、human gate
-    05-cost-and-risk.md            # 成本与风险控制
+    03-dispatch-design.md          # coordinator -> executor/reviewer 任务派发设计（正文完成）
+    04-quality-gate.md             # 验收、review、human gate（正文完成）
+    05-cost-and-risk.md            # 成本与风险控制（正文完成）
     changelog-watch.md             # Cursor 更新对手册的影响追踪
   templates/
     task-package.md                # 任务包模板（任务的唯一事实来源）
