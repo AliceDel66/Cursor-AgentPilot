@@ -1,8 +1,9 @@
 #!/bin/sh
 # AgentPilot 一键挂载脚本（纯 POSIX shell，零依赖）
-# 用法：./install.sh /path/to/project [--skill]
-#   把 AgentPilot 工作流挂载到目标项目：tasks/、runs/、templates/agentpilot/、.cursor/rules/
-#   --skill 额外把 Coordinator skill 安装到 ~/.cursor/skills/agentpilot/
+# 用法：
+#   ./install.sh --skill-only              仅安装全局 Coordinator skill
+#   ./install.sh /path/to/project           挂载工作流到目标项目
+#   ./install.sh /path/to/project --skill   挂载 + 安装全局 skill
 
 set -eu
 
@@ -13,14 +14,18 @@ usage() {
 AgentPilot 挂载脚本
 
 用法：
-  ./install.sh /path/to/project           挂载工作流到目标项目
-  ./install.sh /path/to/project --skill   同时安装 Coordinator skill 到 ~/.cursor/skills/
+  ./install.sh --skill-only                 仅安装 Coordinator skill 到 ~/.cursor/skills/（全局）
+  ./install.sh /path/to/project             挂载工作流到目标项目
+  ./install.sh /path/to/project --skill     挂载 + 安装全局 skill
 
-挂载内容：
+挂载内容（项目）：
   <project>/tasks/                            任务包目录
   <project>/runs/                             派发留档目录
-  <project>/templates/agentpilot/*.md         协议模板（task package / review packet 等）
+  <project>/templates/agentpilot/*.md         协议模板
   <project>/.cursor/rules/agentpilot-coordinator.mdc   Coordinator 行为规则
+
+全局 skill：
+  ~/.cursor/skills/agentpilot/SKILL.md        跨项目自动触发 Coordinator 行为
 EOF
 }
 
@@ -49,20 +54,35 @@ copy_file() {
 
 PROJECT=""
 INSTALL_SKILL=0
+SKILL_ONLY=0
 for arg in "$@"; do
   case "$arg" in
     --skill) INSTALL_SKILL=1 ;;
+    --skill-only) SKILL_ONLY=1; INSTALL_SKILL=1 ;;
     -h|--help) usage; exit 0 ;;
     -*) echo "未知参数: $arg"; usage; exit 1 ;;
     *) PROJECT=$arg ;;
   esac
 done
 
-[ -n "$PROJECT" ] || { usage; exit 1; }
-[ -d "$PROJECT" ] || { echo "错误: 目标项目目录不存在: $PROJECT"; exit 1; }
+if [ "$SKILL_ONLY" -eq 1 ] && [ -n "$PROJECT" ]; then
+  echo "错误: --skill-only 不能与项目路径同时使用"
+  usage
+  exit 1
+fi
 
-echo "== 挂载 AgentPilot 到: $PROJECT"
+if [ "$SKILL_ONLY" -eq 0 ]; then
+  [ -n "$PROJECT" ] || { usage; exit 1; }
+  [ -d "$PROJECT" ] || { echo "错误: 目标项目目录不存在: $PROJECT"; exit 1; }
+fi
 
+if [ "$SKILL_ONLY" -eq 1 ]; then
+  echo "== 安装 AgentPilot 全局 Skill"
+else
+  echo "== 挂载 AgentPilot 到: $PROJECT"
+fi
+
+if [ "$SKILL_ONLY" -eq 0 ]; then
 ensure_dir "$PROJECT/tasks"
 ensure_dir "$PROJECT/runs"
 ensure_dir "$PROJECT/templates/agentpilot"
@@ -103,6 +123,7 @@ alwaysApply: false
 EOF
   echo "生成: $RULE_FILE"
 fi
+fi
 
 if [ "$INSTALL_SKILL" -eq 1 ]; then
   SKILL_DIR="$HOME/.cursor/skills/agentpilot"
@@ -112,14 +133,24 @@ fi
 
 echo ""
 echo "== 安装摘要"
-echo "  任务包目录:   $PROJECT/tasks/"
-echo "  留档目录:     $PROJECT/runs/"
-echo "  协议模板:     $PROJECT/templates/agentpilot/"
-echo "  Cursor 规则:  $RULE_FILE"
+if [ "$SKILL_ONLY" -eq 0 ]; then
+  echo "  任务包目录:   $PROJECT/tasks/"
+  echo "  留档目录:     $PROJECT/runs/"
+  echo "  协议模板:     $PROJECT/templates/agentpilot/"
+  echo "  Cursor 规则:  $RULE_FILE"
+fi
 if [ "$INSTALL_SKILL" -eq 1 ]; then
   echo "  Skill:        $HOME/.cursor/skills/agentpilot/SKILL.md"
 fi
 echo ""
 echo "== 下一步"
-echo "  1. 在 Cursor 中打开该项目，对 Agent 直接说需求即可触发 Coordinator 行为。"
-echo "  2. 30 秒上手见 AgentPilot 仓库 QUICKSTART.md；完整手册见 docs/。"
+if [ "$INSTALL_SKILL" -eq 1 ]; then
+  echo "  1. 新开 Cursor 会话使 skill 生效；提出开发/修复需求即可触发 Coordinator。"
+fi
+if [ "$SKILL_ONLY" -eq 0 ]; then
+  echo "  2. 在 Cursor 中打开该项目，对 Agent 直接说需求即可触发 Coordinator 行为。"
+  echo "  3. 30 秒上手见 QUICKSTART.md；完整手册见 docs/。"
+elif [ "$SKILL_ONLY" -eq 1 ]; then
+  echo "  2. 在具体项目里再运行 ./install.sh /path/to/project 挂载 tasks/ 与模板。"
+  echo "  3. 30 秒上手见 QUICKSTART.md；完整手册见 docs/。"
+fi

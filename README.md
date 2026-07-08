@@ -60,30 +60,47 @@ flowchart LR
 
 不想读手册？[QUICKSTART.md](QUICKSTART.md) 提供最短路径：复制一份最小任务包、填 5 个必填项、粘贴派发话术，30 秒发出第一个合规派发。跑通之后再回来按下面的路径系统学习。
 
-## 🔌 挂载到你的项目
+## 🔌 安装与挂载
 
-三种方式把 AgentPilot 工作流装进任何项目，装完后**对 Agent 只说需求即可**触发协议闭环：
+AgentPilot 分两层：**全局 Skill**（跨项目自动触发 Coordinator）和**项目挂载**（tasks/、模板、规则进具体仓库）。推荐先装 Skill，再在业务项目里挂载。
 
-1. **一键挂载**（推荐）：
+### 全局 Skill（一次安装，所有项目生效）
 
 ```bash
 git clone https://github.com/AliceDel66/Cursor-AgentPilot.git
-./Cursor-AgentPilot/install.sh /path/to/your-project
+./Cursor-AgentPilot/install.sh --skill-only
 ```
 
-自动创建 `tasks/`、`runs/`，复制协议模板到 `templates/agentpilot/`，并生成 `.cursor/rules/agentpilot-coordinator.mdc`（Coordinator 行为规则）。脚本幂等，已有文件不会被覆盖。
+安装到 `~/.cursor/skills/agentpilot/SKILL.md`。**新开 Cursor 会话**后，在任何项目提出开发/修复需求，Agent 会按协议：澄清 → 生成 `tasks/<task_id>.md` → 选路由 → 派发 → 等你 gate。
 
-2. **手动复制**：把 `templates/` 下需要的模板复制进你的项目（CC0，无署名负担），照 [QUICKSTART.md](QUICKSTART.md) 的话术使用。
+> 已手动复制过 skill 的用户：再次运行上述命令会提示"跳过（已存在）"，不会覆盖。
 
-3. **安装 Skill**（跨项目生效）：`./install.sh /path/to/your-project --skill` 会把 Coordinator skill 装到 `~/.cursor/skills/agentpilot/`，此后任何对话中提出开发/修复需求都会自动按协议整理任务包。
+### 项目挂载（每个业务项目一次）
+
+```bash
+./Cursor-AgentPilot/install.sh /path/to/your-project
+# 或同时装全局 skill：
+./Cursor-AgentPilot/install.sh /path/to/your-project --skill
+```
+
+自动创建 `tasks/`、`runs/`，复制协议模板到 `templates/agentpilot/`，并生成 `.cursor/rules/agentpilot-coordinator.mdc`。脚本幂等，已有文件不会被覆盖。
+
+### 手动复制（无脚本）
+
+把 `templates/` 下需要的模板复制进你的项目（CC0，无署名负担），照 [QUICKSTART.md](QUICKSTART.md) 的话术使用。
+
+**装完后对 Agent 只说需求即可**——不必每次手抄任务包。Skill / 规则负责生成 task package；你负责 human gate。
 
 ## ⚡ 5 分钟快速开始
 
+**已安装 Skill 或挂载过的用户**：跳过第 3 步，直接对 Agent 说需求。
+
 1. **读定位**：花 1 分钟读完"这是什么"，确认你的场景匹配。
-2. **挑一个真实小任务**：比如"修一个已知 bug"或"加一个小函数"，不要从大重构开始。
-3. **复制模板**：把 `templates/task-package.md` 复制一份，按字段说明填写背景、目标、范围（allow/deny）、隔离级别、验收标准。
-4. **选路径派发**：对照 [`docs/03-dispatch-design.md`](docs/03-dispatch-design.md) 的 routing matrix 实操版，判断这个任务该交给 Cursor 直接改、Codex 执行，还是需要 reviewer 审查（默认 Claude，双工具模式见 docs/03 第 5 节）。
-5. **验收与留档**：执行完成后对照验收标准逐条检查；如果走了 executor / reviewer 派发，用 `templates/review-packet.md` 汇总证据，由你做最终 human gate。
+2. **安装**（首次）：全局 `./install.sh --skill-only`；业务项目 `./install.sh /path/to/your-project`（见上一节）。
+3. **挑一个真实小任务**：比如"修一个已知 bug"或"加一个小函数"，不要从大重构开始。
+4. **说需求或写包**：有 Skill/规则 → 直接说需求；否则复制 `templates/task-package.md` 填写后派发。
+5. **选路径派发**：对照 [`docs/03-dispatch-design.md`](docs/03-dispatch-design.md) 的 routing matrix；Skill 会自动选 route，你核对即可。
+6. **验收与留档**：执行完成后对照验收标准逐条检查；用 `templates/review-packet.md` 汇总证据，由你做最终 human gate。
 
 跑完一次闭环，你就理解了本项目的全部核心概念：task package → routing → 执行 → review → gate。
 

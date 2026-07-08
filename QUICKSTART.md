@@ -6,11 +6,34 @@ status: complete
 
 # 30 秒上手
 
-不读手册，三步发出你的第一个合规派发。
+不读手册，**装 Skill → 说需求 → gate**，或手动三步发派发。
 
-## 三步用法
+## 第 0 步：安装（推荐，一次即可）
 
-1. **复制**下面的最小任务包，存为你项目里的一个文件（如 `task-fix-login.md`），
+**全局 Skill**（所有项目自动按协议整理任务包）：
+
+```bash
+git clone https://github.com/AliceDel66/Cursor-AgentPilot.git
+./Cursor-AgentPilot/install.sh --skill-only
+```
+
+新开 Cursor 会话后，对 Agent **直接说需求**即可（见下方"自动模式"）。在具体业务项目里再运行 `./install.sh /path/to/your-project` 挂载 `tasks/` 与模板。
+
+## 自动模式（已装 Skill / 项目规则）
+
+对 Agent 说：
+
+```text
+按 AgentPilot 协议处理：<你的需求，如"登录页连点会重复提交，帮我修">
+```
+
+Agent 应：澄清 → 在 `tasks/` 生成任务包 → 选 route 并派发 → 汇总等你 gate。你只需对照 acceptance 验收。
+
+## 手动模式（三步用法）
+
+未安装 Skill 时：
+
+1. **复制**下面的最小任务包，存为你项目里的一个文件（如 `tasks/FIX-001.md`），
 2. **填写** 5 个必填项：`task_id`、`type`、`route`、`scope.allow/deny`、`acceptance`，
 3. **粘贴**派发话术给你的 Agent（Cursor Agent / Codex 均可）。
 
@@ -76,4 +99,4 @@ acceptance:
 - 系统学习：README 的[新手路径](README.md#%EF%B8%8F-新手路径)（5 章手册循序渐进）。
 - 完整协议：[`docs/03-dispatch-design.md`](docs/03-dispatch-design.md)——全量字段、routing matrix、隔离与 worktree、失败重试。
 - 全量模板：[`templates/task-package.md`](templates/task-package.md)（CC0，直接复制进私有项目）。
-- 一键挂载：README 的[挂载到你的项目](README.md#-挂载到你的项目)——install.sh 或 skill 安装，装完对 Agent 只说需求即可。
+- 一键挂载：README 的[安装与挂载](README.md#-安装与挂载)——`install.sh --skill-only`（全局）或 `./install.sh /path/to/project`（项目）。

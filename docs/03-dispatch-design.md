@@ -28,7 +28,7 @@ status: complete
 
 | 角色 | 职责 | 输入 | 输出（交接物） | 默认承担者 |
 | --- | --- | --- | --- | --- |
-| **Coordinator** | 需求 intake、澄清、拆解、路由、轻量执行、协调重试 | 用户需求 | task package | Cursor |
+| **Coordinator** | 需求 intake、澄清、拆解、路由、轻量执行、协调重试 | 用户需求 | task package | Cursor（可通过 `skills/agentpilot/SKILL.md` 或项目 `.cursor/rules/` 自动化五步行为，见第 7 节） |
 | **Executor** | 按任务包实现、本地验证、交付总结 | task package | 代码改动 + review packet | Codex |
 | **Reviewer / Architect** | 独立审查、风险发现、gate 建议 | diff + task package + review packet | 审查结论（PASS/FAIL + 理由） | Claude（可降级，见第 5 节） |
 
@@ -218,11 +218,11 @@ git branch -D task/EX-001
 
 ## 7. 派发实操流程
 
-从需求到派发出去的完整五步：
+从需求到派发出去的完整五步。若已安装 AgentPilot **全局 Skill**（`./install.sh --skill-only`）或在项目运行 **`./install.sh /path/to/project`**，Coordinator 的 1～5 步由 Cursor 自动执行——你只需说需求并在最后做 human gate；以下步骤供手动模式或未触发 skill 时对照。
 
 1. **澄清**：在 Cursor 里把模糊需求问清楚（目标、边界、已知约束）。产出：一段明确的需求描述。
 2. **拆解**：超过一次交付能力的需求先拆（Plan 模式），每个子任务独立可验收。
-3. **写包**：复制 `templates/task-package.md`，按第 3 节字段指南填写。自查工具：`templates/acceptance-checklist.md` 的"派发前检查"。
+3. **写包**：复制 `templates/task-package.md`（或项目内 `templates/agentpilot/task-package.md`），按第 3 节字段指南填写。自查工具：`templates/acceptance-checklist.md` 的"派发前检查"。Skill/规则模式下 Agent 自动写入 `tasks/<task_id>.md`。
 4. **选路由与隔离**：对照第 4 节 matrix 与第 6.1 节流程，填 `route` 与 `isolation`。
 5. **派发**：把 task package 全文交给 executor，附一句边界提醒（prompt 模板见 `templates/cursor-prompt-snippets.md` 片段 4）。
 
