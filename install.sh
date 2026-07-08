@@ -128,7 +128,7 @@ alwaysApply: false
    `model_override.executor / model_override.reviewer`。
    涉及 auth/payment/data/deployment/shared contract 时 `risk_level` 升 medium 以上、
    `gate_required: human`、`isolation` 至少 branch；与其他写任务并行同一 repo 时 `isolation: worktree`。
-   `gate_required: reviewer` 时 reviewer 必须尽量使用不同模型家族；无法满足时在 review packet
+   `gate_required: reviewer` 时 reviewer 必须使用不同模型家族；无法满足时在 review packet
    标注 `same-family-review: true` 并加重 human gate。
    完整规则见 `templates/agentpilot/task-package.md` 注释。
 4. **派发**：话术：

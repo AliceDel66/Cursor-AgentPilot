@@ -41,7 +41,7 @@ acceptance: []               # 每条可执行、可判定
 - 模型默认从 `risk_level` 派生：low → fast、medium → standard、high → high；`type: refactor | research` 上调一档。只有需要精确控制时才写 `model_override.executor / model_override.reviewer`。
 - 涉及 auth / payment / data / deployment / shared contract：`risk_level` 升 `medium` 以上、`gate_required: human`、`isolation` 至少 `branch`。
 - 与其他写任务并行同一 repo：`isolation: worktree`，分支 `task/<task_id>`。
-- `gate_required: reviewer` 时 reviewer 必须尽量使用不同模型家族；无法满足时在 review packet 标注 `same-family-review: true` 并加重 human gate。
+- `gate_required: reviewer` 时 reviewer 必须使用不同模型家族；无法满足时在 review packet 标注 `same-family-review: true` 并加重 human gate。
 - 完整规则见项目内 `templates/agentpilot/task-package.md` 注释与 AgentPilot 手册 docs/03。
 
 ### 4. 派发
