@@ -11,7 +11,7 @@
 | 0 | 立项书 v0.2 → v0.2.1（架构、护城河、协议角色化 + 9.4 双工具降级模式） | 完成 |
 | 1 | 文档骨架 + 模板 frontmatter schema + README（含角色化对齐，commit 65b2fa7 / 074c2d4） | 完成，已验收 |
 | 2 | 新手手册正文（docs/01、02）+ README 开源化美化 + LICENSE（commit 803d13e） | 完成，已验收 |
-| 3 | 派发设计（docs/03、04、05） | 待启动 |
+| 3 | 派发设计正文（docs/03、04、05） | 已派发 |
 | 4 | 示例闭环（examples + runs 首批留档） | 待启动 |
 
 ---
@@ -141,6 +141,84 @@ scope:
 
 ---
 
-## Sprint 3-4 任务包
+## Task Package: Sprint 3 派发设计正文
 
-待 Sprint 2 验收通过后拆解。
+```yaml
+task_id: S3-dispatch-docs
+type: docs-content
+route: codex
+risk_level: low
+gate_required: human
+isolation: none            # 单任务串行，主工作区执行
+protocol_version: "0.1"
+scope:
+  allow:
+    - docs/03-dispatch-design.md
+    - docs/04-quality-gate.md
+    - docs/05-cost-and-risk.md
+    - docs/changelog-watch.md    # 如需登记影响映射
+    - README.md                  # 仅允许改"骨架期"过渡表述与文档状态标注
+  deny:
+    - docs/00-project-brief.md
+    - docs/01-cursor-beginner-guide.md
+    - docs/02-agent-mode-map.md
+    - templates/**
+    - examples/**
+    - LICENSE
+    - CONTRIBUTING.md
+    - plans/plan.md
+```
+
+### 背景
+
+docs/01、02 正文已完成（Sprint 2），三份派发设计文档仍是骨架。立项书 v0.2.2 的第 5、9 节（角色模型、routing matrix、9.3 派发协议、9.4 双工具降级、9.5 隔离与 worktree）是这三章的权威来源，正文是对它们的展开与实操化，不得与立项书冲突。
+
+### 目标
+
+读者读完 docs/03~05 后能独立完成：写一份合格 task package → 选对路径与隔离级别 → 组织 review packet → 执行 gate 判定 → 控制成本与风险。
+
+### 交付物
+
+1. `docs/03-dispatch-design.md` 完整正文：
+   - 角色模型展开：三角色的职责边界、交接物、常见误用（把 coordinator 当 executor 用等）。
+   - task package 逐字段写作指南：每个 frontmatter 字段"怎么填、填错的典型后果"，与 `templates/task-package.md` 注释一致但更展开。
+   - routing matrix 实操版：立项书 9.2 表为基础，每行补一个 1-3 句的真实场景示例。
+   - 双工具降级模式展开（9.4）：三种 reviewer 承担方式的具体操作步骤（如 Codex 双会话怎么开、给什么上下文、禁止给什么）。
+   - 执行隔离与 worktree 策略正文（9.5 展开）：isolation 三级别选择流程、worktree 生命周期五步的具体命令与话术、merge-即-gate 的操作细节、FAIL 丢弃流程。
+   - narrow retry 写法：FAIL 后如何把任务包收窄（范围减半、验收聚焦、附上一轮失败证据）。
+2. `docs/04-quality-gate.md` 完整正文：
+   - 验收标准写作法：可执行、可判定、反例对照（"代码质量好"vs"npm test 退出码 0"）。
+   - review packet 组织法：执行方填什么、证据不足即 FAIL 的原则。
+   - reviewer gate 用法：给 reviewer 的上下文最小集（diff + task package + review packet）、要求的输出格式（PASS/FAIL + 理由 + 风险清单）、上下文隔离硬约束；覆盖三工具与双工具两种配置。
+   - human gate 清单：什么必须人做（merge、高风险判定、协议外决策）、怎么做（对照 acceptance 逐条勾选、亲自跑一条验收命令抽查）。
+   - PASS/FAIL/retry 状态机：mermaid 状态图 + 每个转移的触发条件。
+3. `docs/05-cost-and-risk.md` 完整正文：
+   - 成本模型：按路径的成本分级（对应 routing matrix 成本列）、什么任务不值得派发（沟通成本 > 执行成本的判断法）。
+   - 并行的隐性成本：冲突返工、重复上下文、review 放大。
+   - 风险控制：立项书第 12 节风险表逐条展开为操作建议；敏感边界清单（auth/payment/data/deployment/shared contract）与强制 gate 规则。
+   - 上下文安全：task package / review packet 中禁止出现的内容（secrets、token、内部 URL）与替代写法。
+   - rollback 思维：branch/worktree 的可丢弃性、merge 前的最后检查。
+4. `docs/changelog-watch.md`：如 03~05 引用了 changelog 功能点，补充影响映射行。
+5. README.md：把快速开始第 4 步"骨架期可先看立项书 9.2 节"的过渡表述改为直接指向 docs/03；目录导航中 03~05 的注释加"（正文完成）"。
+
+### 非目标 / 禁止项
+
+- 不改 templates（协议已定稿；发现模板与正文冲突时以模板为准并在回复中上报，不擅自改）。
+- 不改立项书、docs/01、02、examples、plan。
+- 不引入新的协议字段——如认为字段缺失，在回复中提出建议，由 Cursor 决定。
+- 不虚构 Cursor 功能，拿不准的标注"以官方文档为准"附链接。
+
+### 验收
+
+- 三份文档 frontmatter：`status: complete`、`last_verified: 2026-07-08`，PyYAML 全仓解析通过。
+- docs/03 的字段指南与 templates/task-package.md 的字段/枚举完全一致（逐字段核对）。
+- docs/04 含 PASS/FAIL/retry mermaid 状态图且语法可渲染。
+- 与立项书 9.2~9.5 无表述冲突。
+- 全部简体中文（专有名词英文）。
+- git commit（不 push，验收后统一 push）。
+
+---
+
+## Sprint 4 任务包
+
+待 Sprint 3 验收通过后拆解。
