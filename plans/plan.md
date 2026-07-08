@@ -279,6 +279,70 @@ scope:
 
 ---
 
+## Task Package: S3.6 Skill 化与一键挂载
+
+```yaml
+task_id: S3.6-skill-install
+type: feature
+route: codex
+risk_level: low
+gate_required: human
+isolation: none
+protocol_version: "0.1"
+scope:
+  allow:
+    - skills/**
+    - install.sh
+    - README.md
+    - QUICKSTART.md
+  deny:
+    - docs/**
+    - templates/**
+    - examples/**
+    - plans/plan.md
+    - LICENSE
+    - CONTRIBUTING.md
+```
+
+### 背景
+
+用户希望 AgentPilot 不止是"手册 + 手动复制模板"，而是：① 像 Cursor Skill 一样装一次、对话中自动触发；② 像脚手架一样在创建/接入项目时一键挂载协议。两者都不得破坏零依赖原则（纯 Markdown + 纯 shell，不引 npm/pip/CI）。
+
+### 目标
+
+装了 skill 的用户对 Cursor 只说需求即可触发协议闭环；任何项目跑一条命令即可挂载 AgentPilot 工作流。
+
+### 交付物
+
+1. `skills/agentpilot/SKILL.md`（新建）：
+   - 标准 Cursor Skill 格式（frontmatter: name、description——description 写清触发条件："用户提出开发/修复/重构需求且涉及派发或多 Agent 协作时使用"）。
+   - 正文定义 Coordinator 行为：五步（澄清 → 生成 tasks/<task_id>.md 任务包 → 按 routing matrix 选 route 与 isolation → 派发话术 → 汇总等 human gate）；必填 5 字段 + 默认值约定与 QUICKSTART 一致；硬边界（merge 与高风险判定永远留给人；写不出 acceptance 就回澄清；scope 外不改）。
+   - 内嵌最小任务包骨架与派发/验收话术（可引用 QUICKSTART，不整段复述）。
+2. `install.sh`（新建，仓库根目录，纯 POSIX shell，无外部依赖）：
+   - 用法：`./install.sh /path/to/project`（无参数时打印用法）。
+   - 动作：在目标项目创建 `tasks/`、`runs/`；复制 `templates/*.md` 到 `<project>/templates/agentpilot/`；生成 `<project>/.cursor/rules/agentpilot-coordinator.mdc`（内容与 SKILL.md 的 Coordinator 行为一致，规则形式）；可选 `--skill` 参数把 skill 复制到 `~/.cursor/skills/agentpilot/`。
+   - 幂等：已存在的文件不覆盖（提示跳过）；结束时打印"装了什么 + 下一步做什么"。
+   - `shellcheck` 级别的干净写法（不要求真装 shellcheck，语法规范即可）。
+3. `README.md`：
+   - "30 秒上手"节之后新增"🔌 挂载到你的项目"一节：两种方式（install.sh 一键挂载 / 手动复制），以及 skill 安装方式；说明挂载后"只说需求即可"。
+   - 目录导航加 `skills/`、`install.sh` 条目。
+4. `QUICKSTART.md`：末尾"想更进一步"加一行指向"挂载到你的项目"（README 对应节）。
+
+### 非目标 / 禁止项
+
+- 不引入 npm/pip/Homebrew 等任何包管理依赖；不做 npx 包发布（后续 P3 再议）。
+- 不改 templates/**、docs/**；skill 与规则中的字段、枚举、默认值必须与 templates/task-package.md 及 QUICKSTART 完全一致，不新造。
+- skill 不承担 executor/reviewer 职责，不自动 merge。
+
+### 验收
+
+- `bash -n install.sh` 语法通过；在 /tmp 建临时目录实测一次挂载，验证目录/文件生成正确且二次运行幂等。
+- SKILL.md frontmatter 可被 PyYAML 解析；全仓 frontmatter 验证通过。
+- README/QUICKSTART 渲染无破版。
+- git commit（不 push，验收后统一 push）。
+
+---
+
 ## Sprint 4 任务包
 
 待 Sprint 3.5 验收通过后拆解。
