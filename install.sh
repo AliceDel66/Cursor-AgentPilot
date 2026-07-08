@@ -17,6 +17,7 @@ AgentPilot 挂载脚本
   ./install.sh --skill-only                 仅安装 Coordinator skill 到 ~/.cursor/skills/（全局）
   ./install.sh /path/to/project             挂载工作流到目标项目
   ./install.sh /path/to/project --skill     挂载 + 安装全局 skill
+  ./install.sh /path/to/project --upgrade   升级已挂载项目的规则与模板（覆盖旧版）
 
 挂载内容（项目）：
   <project>/tasks/                            任务包目录
@@ -39,14 +40,18 @@ ensure_dir() {
   fi
 }
 
-# 幂等辅助：文件存在则不覆盖
+# 幂等辅助：文件存在则不覆盖（--upgrade 时强制覆盖）
 copy_file() {
   src=$1; dst=$2
-  if [ -e "$dst" ]; then
+  if [ -e "$dst" ] && [ "$UPGRADE" -eq 0 ]; then
     echo "跳过（已存在）: $dst"
   else
     cp "$src" "$dst"
-    echo "复制: $dst"
+    if [ "$UPGRADE" -eq 1 ] && [ -e "$dst" ]; then
+      echo "升级: $dst"
+    else
+      echo "复制: $dst"
+    fi
   fi
 }
 
@@ -55,10 +60,12 @@ copy_file() {
 PROJECT=""
 INSTALL_SKILL=0
 SKILL_ONLY=0
+UPGRADE=0
 for arg in "$@"; do
   case "$arg" in
     --skill) INSTALL_SKILL=1 ;;
     --skill-only) SKILL_ONLY=1; INSTALL_SKILL=1 ;;
+    --upgrade) UPGRADE=1 ;;
     -h|--help) usage; exit 0 ;;
     -*) echo "未知参数: $arg"; usage; exit 1 ;;
     *) PROJECT=$arg ;;
@@ -93,7 +100,7 @@ done
 
 ensure_dir "$PROJECT/.cursor/rules"
 RULE_FILE="$PROJECT/.cursor/rules/agentpilot-coordinator.mdc"
-if [ -e "$RULE_FILE" ]; then
+if [ -e "$RULE_FILE" ] && [ "$UPGRADE" -eq 0 ]; then
   echo "跳过（已存在）: $RULE_FILE"
 else
   cat > "$RULE_FILE" <<'EOF'
