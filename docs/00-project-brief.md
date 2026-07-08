@@ -122,7 +122,7 @@ flowchart TB
 所有模板都是 "Markdown 正文 + YAML frontmatter" 双态结构：
 
 - 人读正文，工具读 frontmatter。
-- frontmatter 定义结构化字段：`task_id`、`type`、`route`、`scope.allow`、`scope.deny`、`acceptance[]`、`risk_level`、`gate_required`。
+- frontmatter 定义结构化字段：`task_id`、`type`、`route`、`isolation`、`scope.allow`、`scope.deny`、`acceptance[]`、`risk_level`、`gate_required`。
 - 这使 P1 的手册模板到 P3 的 CLI 之间没有迁移成本：CLI 直接 parse 现有模板。
 
 协议三件套：
@@ -222,20 +222,21 @@ Cursor 迭代快是行业性痛点，把它变成优势：
 
 ### 9.2 Routing Matrix
 
-| 任务类型 | 推荐路径 | 原因 | 成本 |
-| --- | --- | --- | --- |
-| "解释 Cursor 怎么用" | Cursor | 交互式问答最快 | 低 |
-| "帮我写一个小函数" | Cursor 或 Codex | 小改动 Cursor 足够；涉及 repo 验证交给 Codex | 低 |
-| "修一个 bug" | Codex -> Claude review | 需要 trace、修复、测试、gate | 中 |
-| "大功能拆解" | Cursor Plan -> task package -> Codex | 先规划，再执行 | 中 |
-| "多个独立调研" | Cursor Multitask | 并行收益高，冲突低 | 中 |
-| "跨前后端联调" | Codex implementation + Claude gate | 合同多、风险高 | 高 |
-| "架构方案比较" | Claude -> Cursor/Codex 落地 | Claude 适合风险和方案辨析 | 中 |
-| "上线前检查" | Codex verify -> Claude review | 执行证据 + 独立审查 | 高 |
+| 任务类型 | 推荐路径 | 隔离级别 | 原因 | 成本 |
+| --- | --- | --- | --- | --- |
+| "解释 Cursor 怎么用" | Cursor | none | 交互式问答最快 | 低 |
+| "帮我写一个小函数" | Cursor 或 Codex | none | 小改动 Cursor 足够；涉及 repo 验证交给 Codex | 低 |
+| "修一个 bug" | Codex -> reviewer gate | none / branch | 需要 trace、修复、测试、gate | 中 |
+| "大功能拆解" | Cursor Plan -> task package -> Codex | branch / worktree | 先规划，再执行；多子任务并行时 worktree | 中 |
+| "多个独立调研" | Cursor Multitask | none（只读） | 并行收益高，冲突低 | 中 |
+| "并行开发多个功能" | 多个 Codex，每个独立 worktree | worktree | 机制性避免同仓冲突（见 9.5） | 高 |
+| "跨前后端联调" | Codex implementation + reviewer gate | branch / worktree | 合同多、风险高 | 高 |
+| "架构方案比较" | reviewer 辨析 -> Cursor/Codex 落地；需实证时 best-of-N worktree | worktree | 方案对比互不污染，取优后丢弃 | 中 |
+| "上线前检查" | Codex verify -> reviewer review | none | 执行证据 + 独立审查 | 高 |
 
 ### 9.3 派发协议
 
-每个跨工具任务必须先产出 task package，至少包含：背景、目标、范围（allow/deny）、非目标、上下文、验收（命令/路径/截图/gate）、风险、交付。
+每个跨工具任务必须先产出 task package，至少包含：背景、目标、范围（allow/deny）、非目标、上下文、验收（命令/路径/截图/gate）、风险、隔离级别（见 9.5）、交付。
 
 ### 9.4 双工具降级模式（Cursor + Codex，无 Claude）
 
@@ -253,6 +254,40 @@ Cursor 迭代快是行业性痛点，把它变成优势：
 - 上下文隔离是硬约束：review 会话不得复用实现会话；宁可信息少，不可立场同。
 - 高风险任务在双工具模式下 human gate 不可省略（三工具模式下同样建议保留）。
 - 手册与模板（`route` 字段）统一用角色名 `reviewer`，不硬编码 `claude`，工具配置在用户侧映射。
+
+### 9.5 执行隔离与 Worktree 策略（v0.2.2 新增）
+
+多 Agent 并行的最大风险是同仓冲突。仅靠"不并行改同一链路"的纪律约束不够，协议需要机制保障：每个 task package 必须声明 `isolation` 隔离级别。
+
+| `isolation` | 含义 | 适用 |
+| --- | --- | --- |
+| `none` | 直接在当前工作区执行 | 只读调研、单任务串行、低风险小改动 |
+| `branch` | 同工作区新分支执行 | 单任务但改动较大，需要干净的 diff 与可丢弃性 |
+| `worktree` | 独立 git worktree（独立目录 + 独立分支）执行 | 并行执行任务、长耗时后台任务、高风险重构、实验性方案对比 |
+
+强制升级规则（协议硬约束，不是建议）：
+
+- 两个及以上 executor 任务**时间上并行**且目标同一 repo → 每个任务 `isolation: worktree`，各自独立分支。
+- `risk_level: high` 或涉及 auth/payment/data/deployment/shared contract → 至少 `branch`，并行时必须 `worktree`。
+- 方案对比（同一任务派发多个实现取优）→ 每个实现一个 worktree，best-of-N 后淘汰其余。
+- Cursor Multitask 的只读 research subagents 不需要 worktree；一旦 subagent 要写文件，按上表升级。
+
+Worktree 生命周期协议（写入 task package 的 `delivery`）：
+
+1. **创建**：coordinator（或 executor 按任务包指令）以 `git worktree add ../<repo>-<task_id> -b task/<task_id>` 创建；task package 的 `scope` 约束在 worktree 内同样生效。
+2. **执行**：executor 全程只在自己的 worktree 内工作，禁止 cd 回主工作区改文件。
+3. **交付**：review packet 必须附 worktree 分支名与 `git diff main...task/<task_id>` 摘要；reviewer 在该分支上审查。
+4. **合并即 gate**：merge 动作只能由 human gate（或其明确授权）执行；PASS → merge + `git worktree remove`；FAIL → narrow retry 在同一 worktree 继续，或整个丢弃（worktree 的可丢弃性就是回滚机制）。
+5. **留档**：runs 记录中写入 worktree 分支名、合并 commit、丢弃原因（如有）。
+
+对应 frontmatter 字段：
+
+```yaml
+isolation: worktree        # none | branch | worktree
+worktree:                  # isolation: worktree 时必填
+  branch: task/EX-001
+  merge_by: human          # 合并权限：human | coordinator
+```
 
 ## 10. 仓库架构
 
@@ -291,7 +326,8 @@ cursor-agentpilot/
 - 先 trace，后修改。
 - 先本地验证，后声称完成。
 - 先 review packet，后 Claude gate。
-- 并行只用于低耦合任务。
+- 并行只用于低耦合任务；并行写任务必须各自独立 worktree。
+- merge 只能由 human gate 执行；worktree 的可丢弃性就是回滚机制。
 - 涉及 auth、payment、data、deployment、shared contract 的任务必须走 gate。
 - 每章标注 `last_verified` 与来源链接。
 
@@ -300,7 +336,7 @@ cursor-agentpilot/
 | 风险 | 控制方式 |
 | --- | --- |
 | Cursor 功能更新快，手册过期 | `last_verified` + changelog-watch 机制（见 7.3） |
-| 多 Agent 改同一文件冲突 | 默认不并行修改同一核心链路；worktree 或串行合并 |
+| 多 Agent 改同一文件冲突 | `isolation` 字段机制保障：并行写任务强制独立 worktree，merge 即 gate（见 9.5） |
 | 成本不可控 | routing matrix 标注低/中/高成本 |
 | 上下文泄漏 | task package 不写 secrets；review packet 不贴敏感 token |
 | Claude / Codex 输出不一致 | human gate 以验收标准和本地验证为准 |
