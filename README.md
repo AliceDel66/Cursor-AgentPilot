@@ -56,6 +56,10 @@ flowchart LR
   J --> C
 ```
 
+## 🚀 30 秒上手
+
+不想读手册？[QUICKSTART.md](QUICKSTART.md) 提供最短路径：复制一份最小任务包、填 5 个必填项、粘贴派发话术，30 秒发出第一个合规派发。跑通之后再回来按下面的路径系统学习。
+
 ## ⚡ 5 分钟快速开始
 
 1. **读定位**：花 1 分钟读完"这是什么"，确认你的场景匹配。
@@ -84,6 +88,7 @@ flowchart LR
 ```text
 cursor-agentpilot/
   README.md                        # 本文件：定位、快速开始、导航
+  QUICKSTART.md                    # 30 秒上手：最小任务包 + 派发/验收话术
   LICENSE                          # CC BY 4.0
   CONTRIBUTING.md                  # 贡献指引
   docs/
