@@ -68,18 +68,23 @@ flowchart LR
 
 - 刚开始用 Cursor 的开发者。
 - 想从"让 AI 写代码"升级到"用 AI 管理开发流程"的独立开发者。
+- 只用 Cursor + Codex 的双工具用户（走 9.4 降级模式，工作流完整可用）。
 - 使用 Cursor + Codex + Claude 的多模型用户。
 - 小团队技术负责人，需要定义 agentic coding 规范。
 - 需要把需求、开发、review、验收串起来的产品型开发者。
 
 ## 5. 核心定位
 
-本项目不是 Cursor 官方文档翻译，也不是泛 AI 工具测评。它是 **工作流手册 + 派发协议**：
+本项目不是 Cursor 官方文档翻译，也不是泛 AI 工具测评。它是 **工作流手册 + 派发协议**。
 
-- Cursor 是 cockpit：输入、理解、拆解、协调、轻量执行。
-- Codex 是 executor：本地 repo 修改、测试、浏览器验证、交付总结。
-- Claude 是 reviewer / architect：方案评审、代码 review、风险发现、gate 判断。
+协议按 **角色** 设计，而不是按具体工具设计：
+
+- **Coordinator（cockpit）**：输入、理解、拆解、协调、轻量执行。默认由 Cursor 承担。
+- **Executor**：本地 repo 修改、测试、浏览器验证、交付总结。默认由 Codex 承担。
+- **Reviewer / Architect**：方案评审、代码 review、风险发现、gate 判断。默认由 Claude 承担，但可降级（见 9.4）。
 - Markdown task package 是跨工具交接协议：谁接任务都先读同一份上下文。
+
+Reviewer 角色的本质要求只有一条：**审查者不得复用执行者的同一份上下文**（避免"自己改自己审"）。任何满足该约束的模型/会话都可以承担此角色，因此本项目对"只有 Cursor + Codex"的双工具用户同样完整可用。
 
 ## 6. 系统架构（v0.2 新增）
 
@@ -213,6 +218,8 @@ Cursor 迭代快是行业性痛点，把它变成优势：
 | Codex | 本地 repo 执行、文件修改、跑测试、浏览器 QA、交付总结 | 没有明确验收标准的大方向探索 |
 | Claude | 架构判断、方案评审、代码 review、风险发现、P1/P2 gate | 直接长期持有本地执行状态 |
 
+注：表中 Claude 是 Reviewer 角色的默认承担者。无 Claude 时的角色映射见 9.4。
+
 ### 9.2 Routing Matrix
 
 | 任务类型 | 推荐路径 | 原因 | 成本 |
@@ -229,6 +236,23 @@ Cursor 迭代快是行业性痛点，把它变成优势：
 ### 9.3 派发协议
 
 每个跨工具任务必须先产出 task package，至少包含：背景、目标、范围（allow/deny）、非目标、上下文、验收（命令/路径/截图/gate）、风险、交付。
+
+### 9.4 双工具降级模式（Cursor + Codex，无 Claude）
+
+大量用户只有 Cursor + Codex。协议在此配置下完整可用，只需重新映射 Reviewer 角色：
+
+| Reviewer 承担方式 | 做法 | 适用 |
+| --- | --- | --- |
+| Codex 双会话 | 执行会话完成后，另开一个**全新只读会话**，只喂 review packet + diff，不给执行过程上下文 | 代码 review、上线前检查 |
+| Cursor 审查 | Cursor 作为 coordinator 核对交付物、验收命令输出与 scope 边界 | 中低风险任务的常规 gate |
+| Human gate 加重 | 人工逐条核对验收标准、亲自跑验收命令、读 diff | 高风险任务（auth/payment/data/deployment） |
+
+规则：
+
+- 双工具模式下 routing matrix 中所有 "Claude review / Claude gate" 替换为上表方式之一，路径其余部分不变。
+- 上下文隔离是硬约束：review 会话不得复用实现会话；宁可信息少，不可立场同。
+- 高风险任务在双工具模式下 human gate 不可省略（三工具模式下同样建议保留）。
+- 手册与模板（`route` 字段）统一用角色名 `reviewer`，不硬编码 `claude`，工具配置在用户侧映射。
 
 ## 10. 仓库架构
 
