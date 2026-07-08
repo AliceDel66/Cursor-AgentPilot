@@ -5,6 +5,7 @@ sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
 suited_route: "Codex（trace + 修复 + 测试）-> reviewer gate"
+isolation: none
 ---
 
 # 案例：Bug 排查修复流程（bug-hunt-flow）

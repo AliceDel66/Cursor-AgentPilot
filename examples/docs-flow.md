@@ -5,6 +5,7 @@ sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
 suited_route: "Cursor 单 Agent 或 Codex（多文件批量时）；Multitask 适合并行调研"
+isolation: none
 ---
 
 # 案例：文档任务流程（docs-flow）

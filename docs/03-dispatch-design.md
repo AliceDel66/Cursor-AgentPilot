@@ -20,7 +20,7 @@ status: skeleton
 
 ## 3. Task Package 协议
 
-逐字段讲解 task package 的 frontmatter schema（`task_id`、`type`、`route`、`scope`、`acceptance`、`risk_level`、`gate_required`、`protocol_version`）与正文结构。
+逐字段讲解 task package 的 frontmatter schema（`task_id`、`type`、`route`、`isolation`、`scope`、`acceptance`、`risk_level`、`gate_required`、`protocol_version`）与正文结构。
 
 ## 4. Routing Matrix
 
@@ -34,10 +34,14 @@ status: skeleton
 
 什么任务可以 Multitask 并行、什么必须串行，如何避免多 Agent 改同一文件。
 
-## 7. 失败与重试
+## 7. 执行隔离与 Worktree 策略
+
+讲解 `isolation` 级别（none / branch / worktree）的选择规则与强制升级条件，以及 worktree 生命周期五步（创建/执行/交付/合并即 gate/留档），对应立项书 9.5。正文 Sprint 3 补全。
+
+## 8. 失败与重试
 
 FAIL 之后如何收窄任务（narrow retry）重新派发，而不是原样重跑。
 
-## 8. 下一步
+## 9. 下一步
 
 指向 `04-quality-gate.md`：派发出去的任务如何验收。

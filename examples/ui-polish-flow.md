@@ -5,6 +5,7 @@ sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
 suited_route: "Cursor 单 Agent（小改）或 Codex + 浏览器验证（需截图证据）"
+isolation: none
 ---
 
 # 案例：UI 打磨流程（ui-polish-flow）

@@ -16,6 +16,7 @@ protocol_version: "0.1"
 - [ ] 每条 acceptance 都可执行、可判定（有命令/路径/预期输出）
 - [ ] 非目标已写明，防止范围蔓延
 - [ ] `risk_level` 与 `gate_required` 匹配（auth/payment/data/deployment/shared contract 必须走 gate）
+- [ ] `isolation` 级别已按立项书 9.5 规则声明（并行写 → worktree；high 风险 → 至少 branch）
 - [ ] 上下文材料（文件、文档链接）执行方可直接访问
 
 ## 验收检查（gate 方）
@@ -25,6 +26,7 @@ protocol_version: "0.1"
 - [ ] 改动未越出 `scope.allow`，未触碰 `scope.deny`
 - [ ] 测试/验证命令在本地实际复跑通过（不只信 agent 的输出）
 - [ ] 风险发现一节已阅读，遗留项已记录
+- [ ] worktree 任务：merge 由 human gate（或其明确授权）执行，merge 后 worktree 已清理
 - [ ] 判定结论（PASS / FAIL + narrow retry 范围）已写回 review packet 或 runs 留档
 
 ## 判定结果

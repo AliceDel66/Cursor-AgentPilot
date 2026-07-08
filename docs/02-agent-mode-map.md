@@ -34,7 +34,7 @@ Plan 模式的触发时机：大任务、多方案、需求不清时先出计划
 
 ## 6. Worktree：后台分支任务
 
-Worktrees / multi-root workspaces 如何承载后台分支和跨仓库任务。
+Worktrees / multi-root workspaces 如何承载后台分支和跨仓库任务。本节将结合派发协议的 `isolation` 隔离级别（none / branch / worktree，见立项书 9.5）说明何时必须用 worktree：并行写任务、长耗时后台任务、高风险重构与方案对比。
 
 ## 7. 模式选择速查表
 

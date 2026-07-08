@@ -5,6 +5,7 @@ sources:
   - docs/00-project-brief.md 第 8.2 节
 status: skeleton
 suited_route: "Cursor Plan -> task package -> Codex（+ reviewer gate，视风险）"
+isolation: branch
 ---
 
 # 案例：功能开发端到端流程（feature-flow）

@@ -20,6 +20,8 @@ Cursor 已经从代码编辑器演进为 agentic coding 工作台，但新手的
 - **Reviewer / Architect**：方案评审、代码 review、风险发现、gate 判断。默认由 Claude 承担；没有 Claude 也能用（见立项书 9.4 双工具降级模式）。
 - **Markdown task package 是跨工具交接协议**：谁接任务都先读同一份上下文。
 
+每个任务包还需声明 `isolation` 隔离级别（none / branch / worktree）：并行写任务强制独立 worktree、merge 即 gate，机制性避免多 Agent 同仓冲突（详见 `docs/03-dispatch-design.md` 与立项书 9.5）。
+
 ## 适合谁
 
 - 刚开始用 Cursor 的开发者。
